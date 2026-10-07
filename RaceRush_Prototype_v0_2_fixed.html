@@ -1,0 +1,366 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>RaceRush v0.2</title><style>
+body{margin:0;background:#0b1020;color:#fff;font:16px system-ui;padding:18px}.wrap{max-width:700px;margin:auto}.card{background:#151d33;border:1px solid #33405f;border-radius:18px;padding:20px;margin:14px 0}.center{text-align:center}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}button{padding:14px;border-radius:12px;border:1px solid #425070;background:#202b47;color:#fff;font-weight:800;font-size:15px}button:hover{filter:brightness(1.15)}.primary{background:#6c7cff;border:0}.hidden{display:none}.coin{font-size:70px;margin:20px}.score{display:flex;justify-content:space-between;font-size:22px;font-weight:900}.timer{text-align:center;font-size:42px;font-weight:900;margin:10px}.hunt{height:430px;position:relative;background:radial-gradient(circle,#293861,#10182c);border-radius:16px;overflow:hidden}.num{position:absolute;width:44px;height:44px;padding:0;background:white;color:#111;border:0}.pill{display:inline-block;background:#27324f;border-radius:20px;padding:6px 10px;font-size:12px}.result{font-size:28px;font-weight:900;color:#ffd166}.small{color:#aab4cf;font-size:13px}@media(max-width:500px){.grid{grid-template-columns:1fr}.hunt{height:380px}}
+</style></head><body><div class="wrap"><div class="center"><h1>⚡ RACERUSH</h1><p class="small">Two players. Two challenges. Beat the clock.</p></div>
+<section id="home" class="card"><h2>Match Length</h2><div class="grid"><button id="quickBtn">⚡ Quick<br><span class="small">First to 5</span></button><button id="classicBtn">🔥 Classic<br><span class="small">First to 10</span></button></div></section>
+<section id="diff" class="card hidden"><h2>Difficulty</h2><div class="grid"><button id="easyBtn">🟢 Easy<br><span class="small">1–25</span></button><button id="mediumBtn">🟡 Medium<br><span class="small">1–100</span></button><button id="hardBtn">🔴 Hard<br><span class="small">1–200</span></button></div></section>
+<section id="toss" class="card center hidden"><span id="info" class="pill"></span><h2>🪙 Toss</h2><div id="coin" class="coin">🪙</div><p id="tossText" class="small">Flip to decide who controls the first move.</p><button id="flip" class="primary">FLIP COIN</button><div id="pick" class="hidden"><h3 id="tw"></h3><p class="small">Toss winner chooses who goes first.</p><div class="grid"><button id="p1first">Player 1 goes first</button><button id="p2first">Player 2 goes first</button></div></div></section>
+<section id="play" class="card hidden"><div class="score"><span>Player 1: <b id="s1">0</b></span><span id="round">Round 1</span><span>Player 2: <b id="s2">0</b></span></div><div class="timer" id="timer">0.00</div><div id="task"></div><p id="msg" class="center small"></p></section>
+<section id="result" class="card center hidden"><span class="pill">ROUND RESULT</span><div id="rw" class="result"></div><p id="rt"></p><button class="primary" id="continueBtn">CONTINUE</button></section>
+<section id="roles" class="card center hidden"><span class="pill">WINNER'S CHOICE</span><h2>Choose next roles</h2><p id="rc" class="small"></p><div class="grid"><button class="primary" id="p1hunt">🔎 Player 1 → Number Hunt<br><span class="small">Player 2 → Challenge</span></button><button id="p1challenge">🎮 Player 1 → Challenge<br><span class="small">Player 2 → Number Hunt</span></button></div></section>
+<section id="done" class="card center hidden"><div style="font-size:60px">🏆</div><h2 id="winner"></h2><p id="final"></p><button class="primary" id="rematch">REMATCH</button></section></div>
+<script>
+(function () {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+
+  let targetScore = 5;
+  let difficulty = "";
+  let score = [0, 0];
+  let round = 1;
+  let firstPlayer = 0;
+  let currentPlayer = 0;
+  let roles = {0: "hunt", 1: "challenge"};
+  let times = {};
+  let timerInterval = null;
+  let startedAt = 0;
+  let tossWinner = null;
+  let roundWinner = null;
+  let lastChallenge = -1;
+  let challenge = null;
+  let target = null;
+
+  const challenges = [
+    ["Tap Rush", "Tap 8 targets as quickly as possible.", "tap"],
+    ["Color Call", "Tap the green button 5 times.", "color"],
+    ["Quick Math", "Solve 4 simple additions.", "math"],
+    ["Odd One", "Find the different symbol.", "odd"],
+    ["Biggest", "Tap the biggest number.", "big"],
+    ["Smallest", "Tap the smallest number.", "small"],
+    ["Memory", "Remember and repeat the sequence.", "memory"],
+    ["Fast Choice", "Choose the correct answer.", "choice"],
+    ["Sequence", "Complete the number sequence.", "sequence"],
+    ["Target Order", "Tap 5 targets in order.", "order"],
+    ["Shape Hunt", "Find the matching shape.", "shape"],
+    ["Count", "Count the objects correctly.", "count"],
+    ["Reaction", "Tap the target as soon as it appears.", "reaction"],
+    ["Pattern", "Choose the next item in the pattern.", "pattern"],
+    ["Pairs", "Find the matching pair.", "pairs"],
+    ["Avoid", "Tap the safe targets and avoid the trap.", "avoid"],
+    ["Sort", "Tap numbers from smallest to largest.", "sort"],
+    ["Grid Memory", "Remember the highlighted position.", "grid"],
+    ["True or False", "Answer four quick statements.", "tf"],
+    ["Color Match", "Choose the matching color.", "match"]
+  ];
+
+  function show(id) { $(id).classList.remove("hidden"); }
+  function hide(id) { $(id).classList.add("hidden"); }
+
+  function setText(id, text) { $(id).textContent = text; }
+
+  // Match selection
+  $("five").addEventListener("click", function () {
+    targetScore = 5;
+    hide("home");
+    show("difficulty");
+  });
+
+  $("ten").addEventListener("click", function () {
+    targetScore = 10;
+    hide("home");
+    show("difficulty");
+  });
+
+  // Difficulty selection
+  document.querySelectorAll("#difficulty button").forEach(function (button) {
+    button.addEventListener("click", function () {
+      difficulty = this.dataset.difficulty || this.textContent.split("\n")[0].trim();
+      hide("difficulty");
+      show("toss");
+      setText("matchInfo", targetScore + " POINTS • " + difficulty.toUpperCase());
+      setText("tossText", "Flip the coin to decide who gets to choose the first turn.");
+      $("tossBtn").disabled = false;
+      hide("tossChoice");
+      $("coin").textContent = "?";
+    });
+  });
+
+  // Toss
+  $("tossBtn").addEventListener("click", function () {
+    if (tossWinner !== null) return;
+
+    tossWinner = Math.random() < 0.5 ? 0 : 1;
+    $("tossBtn").disabled = true;
+    $("coin").classList.remove("spin");
+    void $("coin").offsetWidth;
+    $("coin").classList.add("spin");
+    setText("tossText", "Flipping...");
+
+    setTimeout(function () {
+      $("coin").classList.remove("spin");
+      setText("coin", "P" + (tossWinner + 1));
+      setText("tossText", "Toss complete.");
+      setText("tossWinner", "Player " + (tossWinner + 1) + " won the toss.");
+      show("tossChoice");
+    }, 900);
+  });
+
+  $("tossChoice").querySelectorAll("button").forEach(function (button) {
+    button.addEventListener("click", function () {
+      firstPlayer = Number(this.dataset.player);
+      currentPlayer = firstPlayer;
+      roles = {0: "hunt", 1: "challenge"};
+      score = [0, 0];
+      round = 1;
+      times = {};
+      hide("toss");
+      show("game");
+      beginTurn();
+    });
+  });
+
+  function beginTurn() {
+    clearInterval(timerInterval);
+    setText("roundLabel", "ROUND " + round);
+    setText("turnLabel", "PLAYER " + (currentPlayer + 1) + "'S TURN");
+    setText("p1score", score[0]);
+    setText("p2score", score[1]);
+    setText("feedback", "");
+    $("timer").classList.remove("done");
+    renderTask(roles[currentPlayer]);
+    startTimer();
+  }
+
+  function startTimer() {
+    startedAt = performance.now();
+    $("timer").textContent = "0.00";
+    timerInterval = setInterval(function () {
+      const seconds = (performance.now() - startedAt) / 1000;
+      $("timer").textContent = seconds.toFixed(2);
+    }, 25);
+  }
+
+  function finishTurn() {
+    clearInterval(timerInterval);
+    const seconds = (performance.now() - startedAt) / 1000;
+    times[currentPlayer] = seconds;
+    $("timer").textContent = seconds.toFixed(2);
+    $("timer").classList.add("done");
+    setText("feedback", "Player " + (currentPlayer + 1) + " finished in " + seconds.toFixed(2) + " seconds.");
+
+    if (currentPlayer === firstPlayer) {
+      currentPlayer = 1 - currentPlayer;
+      setTimeout(beginTurn, 900);
+    } else {
+      setTimeout(showRoundResult, 700);
+    }
+  }
+
+  function renderTask(role) {
+    if (role === "hunt") {
+      renderHunt();
+    } else {
+      renderChallenge();
+    }
+  }
+
+  function renderHunt() {
+    const max = difficulty.toLowerCase().includes("easy") ? 25 :
+                difficulty.toLowerCase().includes("medium") ? 100 : 200;
+
+    const count = max === 25 ? 20 : max === 100 ? 38 : 55;
+    const nums = [];
+
+    while (nums.length < count) {
+      const n = 1 + Math.floor(Math.random() * max);
+      if (!nums.includes(n)) nums.push(n);
+    }
+
+    target = nums[Math.floor(Math.random() * nums.length)];
+
+    $("task").innerHTML =
+      '<div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+      '<h2>🔎 Number Hunt</h2>' +
+      '<span class="pill">FIND ' + target + '</span>' +
+      '</div>' +
+      '<div id="huntBoard" class="hunt"></div>' +
+      '</div>';
+
+    const board = $("huntBoard");
+
+    nums.forEach(function (n) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "num";
+      button.textContent = n;
+      button.style.left = (3 + Math.random() * 88) + "%";
+      button.style.top = (4 + Math.random() * 84) + "%";
+      button.style.transform = "rotate(" + (Math.random() * 24 - 12) + "deg)";
+
+      button.addEventListener("click", function () {
+        if (n === target) {
+          finishTurn();
+        } else {
+          button.disabled = true;
+          button.style.opacity = "0.3";
+        }
+      });
+
+      board.appendChild(button);
+    });
+  }
+
+  function renderChallenge() {
+    let index;
+    do {
+      index = Math.floor(Math.random() * challenges.length);
+    } while (index === lastChallenge && challenges.length > 1);
+
+    lastChallenge = index;
+    challenge = challenges[index];
+
+    $("task").innerHTML =
+      '<div class="challengeBox">' +
+      '<h2>🎮 ' + challenge[0] + '</h2>' +
+      '<p class="sub">' + challenge[1] + '</p>' +
+      '<div id="challengeArea" class="challengeArea"></div>' +
+      '</div>';
+
+    const area = $("challengeArea");
+
+    if (challenge[2] === "tap" || challenge[2] === "order") {
+      let count = 0;
+      const total = challenge[2] === "order" ? 5 : 8;
+      const values = challenge[2] === "order" ? [1,2,3,4,5].sort(() => Math.random() - 0.5) : Array(12).fill("●");
+
+      area.innerHTML = '<div class="grid"></div>';
+      const grid = area.firstElementChild;
+
+      values.forEach(function (value) {
+        const button = document.createElement("button");
+        button.className = "bigChoice";
+        button.textContent = value;
+        button.addEventListener("click", function () {
+          if (challenge[2] === "order" && Number(button.textContent) !== count + 1) return;
+          button.disabled = true;
+          count++;
+          if (count >= total) finishTurn();
+        });
+        grid.appendChild(button);
+      });
+      return;
+    }
+
+    if (challenge[2] === "math") {
+      const questions = [];
+      for (let i = 0; i < 4; i++) {
+        const a = 2 + Math.floor(Math.random() * 9);
+        const b = 1 + Math.floor(Math.random() * 9);
+        questions.push([a, b, a + b]);
+      }
+
+      questions.forEach(function (q, i) {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;gap:8px;margin:8px 0";
+        row.innerHTML = '<span style="flex:1;padding:13px;border:1px solid #34415f;border-radius:12px">' +
+          q[0] + " + " + q[1] + " = ?" +
+          '</span><input id="math' + i + '" type="number" style="width:80px;border-radius:12px;border:1px solid #34415f;background:#10182d;color:white;text-align:center;font-size:18px">';
+        area.appendChild(row);
+      });
+
+      const check = document.createElement("button");
+      check.className = "primary";
+      check.style.width = "100%";
+      check.textContent = "CHECK ANSWERS";
+      check.addEventListener("click", function () {
+        const correct = questions.every(function (q, i) {
+          return Number($("math" + i).value) === q[2];
+        });
+        if (correct) finishTurn();
+      });
+      area.appendChild(check);
+      return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    const correct = Math.floor(Math.random() * 4);
+
+    ["A", "B", "C", "D"].forEach(function (label, i) {
+      const button = document.createElement("button");
+      button.className = "bigChoice";
+      button.textContent = label;
+      button.addEventListener("click", function () {
+        if (i === correct) finishTurn();
+      });
+      grid.appendChild(button);
+    });
+
+    area.appendChild(grid);
+  }
+
+  function showRoundResult() {
+    hide("game");
+    show("roundResult");
+
+    if (times[0] < times[1]) roundWinner = 0;
+    else if (times[1] < times[0]) roundWinner = 1;
+    else roundWinner = -1;
+
+    if (roundWinner >= 0) {
+      score[roundWinner]++;
+      setText("roundWinner", "🏆 PLAYER " + (roundWinner + 1) + " WINS THE POINT!");
+    } else {
+      setText("roundWinner", "🤝 TIE — NO POINT");
+    }
+
+    $("times").innerHTML =
+      "Player 1: <b>" + times[0].toFixed(2) + "s</b> &nbsp;•&nbsp; " +
+      "Player 2: <b>" + times[1].toFixed(2) + "s</b>";
+
+    if (roundWinner >= 0 && score[roundWinner] >= targetScore) {
+      hide("roundResult");
+      show("matchResult");
+      setText("matchWinner", "🏆 PLAYER " + (roundWinner + 1) + " WINS THE MATCH!");
+      setText("finalScore", "Final score: " + score[0] + " — " + score[1]);
+    }
+  }
+
+  $("continueRound").addEventListener("click", function () {
+    hide("roundResult");
+    if (roundWinner >= 0) {
+      setText("roleWinnerText", "Player " + (roundWinner + 1) + " chooses who does Number Hunt next.");
+      show("roleChoice");
+    } else {
+      nextRound();
+    }
+  });
+
+  $("roleChoice").querySelectorAll("button").forEach(function (button) {
+    button.addEventListener("click", function () {
+      if (this.dataset.roles === "hunt") {
+        roles = {0: "hunt", 1: "challenge"};
+      } else {
+        roles = {0: "challenge", 1: "hunt"};
+      }
+      hide("roleChoice");
+      nextRound();
+    });
+  });
+
+  function nextRound() {
+    round++;
+    firstPlayer = 1 - firstPlayer;
+    currentPlayer = firstPlayer;
+    show("game");
+    beginTurn();
+  }
+
+  // Prevent accidental form-like behavior and ensure all main controls are wired.
+  $("newMatch").addEventListener("click", function () {
+    clearInterval(timerInterval);
+    location.reload();
+  });
+})();
+</script></body></html>
