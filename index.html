@@ -1,714 +1,581 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>RaceRush</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+*{
+  box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background:
-        radial-gradient(circle at top, #243b67 0%, #10182b 45%, #070b15 100%);
-    color: white;
-    min-height: 100vh;
-    overflow-x: hidden;
+body{
+  margin:0;
+  background:#0b1020;
+  color:#fff;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  padding:12px;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
+.wrap{
+  max-width:700px;
+  margin:auto;
 }
 
-#app {
-    width: 100%;
-    max-width: 700px;
-    margin: auto;
-    padding: 18px;
-    min-height: 100vh;
+.card{
+  background:#151d33;
+  border:1px solid #33405f;
+  border-radius:18px;
+  padding:18px;
+  margin:12px 0;
 }
 
-/* HEADER */
-
-.logo {
-    text-align: center;
-    font-size: 42px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    margin: 12px 0 4px;
-    color: #65d8ff;
-    text-shadow:
-        0 0 10px rgba(101,216,255,.7),
-        0 0 30px rgba(101,216,255,.25);
+.center{
+  text-align:center;
 }
 
-.subtitle {
-    text-align: center;
-    color: #9eabc7;
-    margin-bottom: 25px;
+h1{
+  margin:5px 0;
+  font-size:36px;
 }
 
-/* CARDS */
-
-.card {
-    background: rgba(20, 29, 51, .94);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 22px;
-    padding: 22px;
-    margin-bottom: 16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+h2{
+  margin-top:5px;
 }
 
-h2 {
-    margin-top: 0;
-    text-align: center;
+.small{
+  color:#aab4cf;
+  font-size:13px;
 }
 
-/* BUTTONS */
-
-.main-btn {
-    width: 100%;
-    padding: 17px;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #19c8ff, #3978ff);
-    color: white;
-    font-size: 19px;
-    font-weight: 800;
-    margin-top: 12px;
-    box-shadow: 0 7px 20px rgba(25,200,255,.25);
+.hidden{
+  display:none !important;
 }
 
-.main-btn:active {
-    transform: scale(.97);
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
 }
 
-.secondary-btn {
-    width: 100%;
-    padding: 15px;
-    border-radius: 14px;
-    background: #29344f;
-    color: white;
-    font-size: 17px;
-    font-weight: 700;
-    margin-top: 10px;
+button{
+  padding:13px;
+  border-radius:12px;
+  border:1px solid #425070;
+  background:#202b47;
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
 }
 
-.choice-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+button:hover{
+  filter:brightness(1.15);
 }
 
-.choice-btn {
-    padding: 18px 10px;
-    border-radius: 15px;
-    background: #26334f;
-    color: white;
-    font-size: 18px;
-    font-weight: 800;
-    border: 2px solid transparent;
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
 }
 
-.choice-btn.selected {
-    background: linear-gradient(135deg, #16c6ff, #386eff);
-    border-color: #82e7ff;
+.primary{
+  background:#6c7cff;
+  border:0;
 }
 
-/* SCORE */
-
-.scoreboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 15px;
+.name-input{
+  width:100%;
+  padding:14px;
+  margin:7px 0;
+  border-radius:10px;
+  border:1px solid #425070;
+  background:#0f172a;
+  color:white;
+  font-size:16px;
 }
 
-.player-score {
-    background: #18233c;
-    padding: 15px;
-    border-radius: 18px;
-    text-align: center;
+.score{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  font-size:16px;
+  font-weight:900;
 }
 
-.player-name {
-    color: #aebbd5;
-    font-size: 14px;
+.timer{
+  text-align:center;
+  font-size:40px;
+  font-weight:900;
+  margin:8px;
 }
 
-.score {
-    font-size: 38px;
-    font-weight: 900;
-    margin-top: 3px;
+.pill{
+  display:inline-block;
+  background:#27324f;
+  border-radius:20px;
+  padding:6px 10px;
+  font-size:12px;
 }
 
-/* TIMER */
-
-.timer {
-    text-align: center;
-    font-size: 42px;
-    font-weight: 900;
-    margin: 10px 0 18px;
-    color: #65d8ff;
+.result{
+  font-size:28px;
+  font-weight:900;
 }
 
-.timer.warning {
-    color: #ffb84d;
+.coin{
+  font-size:70px;
+  margin:15px;
 }
 
-.timer.danger {
-    color: #ff5964;
+/* =========================
+   NUMBER HUNT
+========================= */
+
+.hunt{
+  height:340px;
+  width:100%;
+  position:relative;
+  background:
+    radial-gradient(circle,#293861,#10182c);
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid #3a4768;
 }
 
-/* NUMBER BOARD */
-
-.target-box {
-    text-align: center;
-    margin-bottom: 15px;
+.num{
+  position:absolute;
+  width:40px;
+  height:40px;
+  min-width:40px;
+  padding:0;
+  background:#fff;
+  color:#111;
+  border:0;
+  border-radius:50%;
+  font-weight:900;
+  font-size:14px;
+  transform-origin:center;
 }
 
-.target-label {
-    color: #9eabc7;
-    font-size: 14px;
+/* =========================
+   MINI GAME AREAS
+========================= */
+
+.mini-area{
+  margin-top:12px;
 }
 
-.target-number {
-    font-size: 54px;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 0 15px rgba(101,216,255,.4);
+.math-question{
+  font-size:32px;
+  font-weight:900;
+  margin:20px 0;
 }
 
-.number-board {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 7px;
-    background: #10192d;
-    padding: 10px;
-    border-radius: 18px;
+.reaction-box{
+  height:220px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#27324f;
+  font-size:25px;
+  font-weight:900;
+  cursor:pointer;
 }
 
-.number-btn {
-    min-height: 54px;
-    border-radius: 11px;
-    background: #273653;
-    color: white;
-    font-size: 18px;
-    font-weight: 800;
-    transition: .12s;
+.memory-sequence{
+  font-size:35px;
+  letter-spacing:12px;
+  margin:25px 0;
+  min-height:50px;
 }
 
-.number-btn:active {
-    transform: scale(.90);
+.odd-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
 }
 
-.number-btn.correct {
-    background: #20c982;
-    box-shadow: 0 0 14px rgba(32,201,130,.4);
+.shape-button{
+  font-size:25px;
+  height:60px;
 }
 
-.number-btn.wrong {
-    background: #ef4f5f;
+.round-history{
+  text-align:left;
+  margin-top:15px;
 }
 
-/* COIN */
-
-.coin {
-    width: 130px;
-    height: 130px;
-    margin: 20px auto;
-    border-radius: 50%;
-    background: linear-gradient(145deg,#ffd86b,#e7a52c);
-    color: #5d3a00;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    font-weight: 900;
-    border: 7px solid #fff0a5;
-    box-shadow:
-        0 0 30px rgba(255,196,54,.35),
-        inset 0 0 15px rgba(255,255,255,.6);
+.round-row{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid #33405f;
 }
 
-.coin.flip {
-    animation: flip .8s ease;
+.final-score{
+  font-size:34px;
+  font-weight:900;
+  margin:15px;
 }
 
-@keyframes flip {
-    0% { transform: rotateY(0); }
-    50% { transform: rotateY(900deg); }
-    100% { transform: rotateY(1800deg); }
-}
+@media(max-width:500px){
 
-/* ROLE */
+  body{
+    padding:8px;
+  }
 
-.role-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
+  .card{
+    padding:14px;
+  }
 
-.role-btn {
-    background: #273653;
-    color: white;
-    padding: 20px 8px;
-    border-radius: 16px;
-    font-size: 18px;
-    font-weight: 800;
-}
+  h1{
+    font-size:30px;
+  }
 
-.role-btn.selected {
-    background: linear-gradient(135deg,#18c7a3,#168bd1);
-}
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-/* MESSAGE */
+  .hunt{
+    height:330px;
+  }
 
-.message {
-    text-align: center;
-    padding: 14px;
-    border-radius: 14px;
-    background: #111b30;
-    color: #b9c5dc;
-    margin-top: 15px;
-    line-height: 1.45;
-}
+  .num{
+    width:36px;
+    height:36px;
+    min-width:36px;
+    font-size:12px;
+  }
 
-.hidden {
-    display: none !important;
-}
+  .score{
+    font-size:13px;
+  }
 
-/* WINNER */
+  .timer{
+    font-size:34px;
+  }
 
-.winner {
-    text-align: center;
-}
-
-.trophy {
-    font-size: 70px;
-    margin: 5px 0;
-}
-
-.winner-name {
-    font-size: 34px;
-    font-weight: 900;
-    color: #ffd45c;
-}
-
-.final-score {
-    font-size: 22px;
-    color: #bdc9df;
-    margin: 10px 0 20px;
-}
-
-/* RESPONSIVE */
-
-@media(max-width:420px) {
-    #app {
-        padding: 12px;
-    }
-
-    .logo {
-        font-size: 36px;
-    }
-
-    .number-btn {
-        min-height: 48px;
-        font-size: 16px;
-    }
-
-    .target-number {
-        font-size: 46px;
-    }
+  .odd-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="app">
+<div class="wrap">
 
-    <!-- HOME -->
-    <section id="homeScreen">
-        <div class="logo">RACERUSH</div>
-        <div class="subtitle">Think fast. Tap faster. Win the race.</div>
+<div class="center">
+  <h1>⚡ RACERUSH</h1>
+  <p class="small">Two players. Five rounds. One winner.</p>
+</div>
 
-        <div class="card">
-            <h2>🏁 Start Match</h2>
 
-            <p style="text-align:center;color:#9eabc7">
-                Choose how many rounds are needed to win.
-            </p>
+<!-- =========================
+     PLAYER SETUP
+========================= -->
 
-            <div class="choice-grid">
-                <button class="choice-btn selected" onclick="selectScore(5,this)">
-                    First to 5
-                </button>
+<section id="setup" class="card">
 
-                <button class="choice-btn" onclick="selectScore(10,this)">
-                    First to 10
-                </button>
-            </div>
-        </div>
+  <h2>👥 Players</h2>
 
-        <div class="card">
-            <h2>🎯 Difficulty</h2>
+  <input
+    id="player1Input"
+    class="name-input"
+    placeholder="Player 1 name"
+    maxlength="18"
+  >
 
-            <div class="choice-grid">
-                <button class="choice-btn selected" onclick="selectDifficulty('easy',this)">
-                    Easy<br>
-                    <small>1–25</small>
-                </button>
+  <input
+    id="player2Input"
+    class="name-input"
+    placeholder="Player 2 name"
+    maxlength="18"
+  >
 
-                <button class="choice-btn" onclick="selectDifficulty('medium',this)">
-                    Medium<br>
-                    <small>1–100</small>
-                </button>
+  <button id="startSetup" class="primary" style="width:100%;margin-top:10px">
+    START RACERUSH
+  </button>
 
-                <button class="choice-btn" onclick="selectDifficulty('hard',this)">
-                    Hard<br>
-                    <small>1–200</small>
-                </button>
-            </div>
+</section>
 
-            <button class="main-btn" onclick="startToss()">
-                START RACERUSH 🚀
-            </button>
-        </div>
-    </section>
 
+<!-- =========================
+     TOSS
+========================= -->
 
-    <!-- TOSS -->
-    <section id="tossScreen" class="hidden">
+<section id="toss" class="card center hidden">
 
-        <div class="logo">RACERUSH</div>
+  <span id="tossInfo" class="pill"></span>
 
-        <div class="card">
-            <h2>🪙 Coin Toss</h2>
+  <h2>🪙 Coin Toss</h2>
 
-            <div id="coin" class="coin">
-                READY
-            </div>
+  <p id="tossInstruction">
+    Player 1, choose Heads or Tails.
+  </p>
 
-            <div id="tossText" class="message">
-                Tossing the coin...
-            </div>
+  <div class="grid">
 
-            <button id="tossButton" class="main-btn hidden" onclick="chooseFirstPlayer()">
-                CONTINUE
-            </button>
-        </div>
+    <button id="headsBtn">
+      🪙 HEADS
+    </button>
 
-    </section>
+    <button id="tailsBtn">
+      🪙 TAILS
+    </button>
 
+  </div>
 
-    <!-- FIRST PLAYER -->
-    <section id="firstPlayerScreen" class="hidden">
+  <div id="coin" class="coin">
+    🪙
+  </div>
 
-        <div class="logo">RACERUSH</div>
+  <p id="tossResult" class="result"></p>
 
-        <div class="card">
-            <h2>👑 Who Goes First?</h2>
+  <div id="firstChoice" class="hidden">
 
-            <div id="tossWinnerText" class="message"></div>
+    <p id="winnerChoiceText"></p>
 
-            <p style="text-align:center;color:#9eabc7">
-                The toss winner chooses who starts the round.
-            </p>
+    <div class="grid">
 
-            <div class="choice-grid">
-                <button class="choice-btn" onclick="setFirstPlayer(1)">
-                    PLAYER 1
-                </button>
+      <button id="p1First"></button>
 
-                <button class="choice-btn" onclick="setFirstPlayer(2)">
-                    PLAYER 2
-                </button>
-            </div>
-        </div>
+      <button id="p2First"></button>
 
-    </section>
+    </div>
 
+  </div>
 
-    <!-- GAME -->
-    <section id="gameScreen" class="hidden">
+</section>
 
-        <div class="logo">RACERUSH</div>
 
-        <div class="scoreboard">
+<!-- =========================
+     GAME
+========================= -->
 
-            <div class="player-score">
-                <div class="player-name">PLAYER 1</div>
-                <div id="score1" class="score">0</div>
-            </div>
+<section id="play" class="card hidden">
 
-            <div class="player-score">
-                <div class="player-name">PLAYER 2</div>
-                <div id="score2" class="score">0</div>
-            </div>
+  <div class="score">
 
-        </div>
+    <span>
+      <span id="p1NameScore"></span>:
+      <b id="s1">0</b>
+    </span>
 
-        <div class="card">
+    <span id="roundLabel">
+      Round 1 / 5
+    </span>
 
-            <div id="roundInfo"
-                 style="text-align:center;color:#9eabc7;margin-bottom:8px">
-            </div>
+    <span>
+      <span id="p2NameScore"></span>:
+      <b id="s2">0</b>
+    </span>
 
-            <div id="turnPlayer"
-                 style="text-align:center;font-size:22px;font-weight:800">
-            </div>
+  </div>
 
-            <div id="timer" class="timer">
-                0.00
-            </div>
+  <div class="timer" id="timer">
+    0.00
+  </div>
 
-            <div class="target-box">
-                <div class="target-label">
-                    FIND THIS NUMBER
-                </div>
+  <div id="task"></div>
 
-                <div id="targetNumber" class="target-number">
-                    -
-                </div>
-            </div>
+  <p id="msg" class="center small"></p>
 
-            <div id="numberBoard" class="number-board">
-            </div>
+</section>
 
-            <div id="gameMessage" class="message">
-                Tap the correct numbers as quickly as possible.
-            </div>
 
-        </div>
+<!-- =========================
+     ROUND RESULT
+========================= -->
 
-    </section>
+<section id="roundResult" class="card center hidden">
 
+  <span class="pill">
+    ROUND COMPLETE
+  </span>
 
-    <!-- ROLE SELECTION -->
-    <section id="roleScreen" class="hidden">
+  <h2 id="roundWinner"></h2>
 
-        <div class="logo">RACERUSH</div>
+  <p id="roundTimes"></p>
 
-        <div class="card">
+  <button id="nextRound" class="primary">
+    NEXT ROUND
+  </button>
 
-            <h2>🏆 Round Winner</h2>
+</section>
 
-            <div id="roundWinnerText"
-                 class="message">
-            </div>
 
-            <p style="text-align:center;color:#9eabc7">
-                The round winner chooses the starting roles.
-            </p>
+<!-- =========================
+     FINAL RESULT
+========================= -->
 
-            <div class="role-grid">
+<section id="finalResult" class="card center hidden">
 
-                <button class="role-btn"
-                        onclick="chooseRoles('normal')">
-                    ⚡<br>
-                    SPEED
-                </button>
+  <div style="font-size:60px">
+    🏆
+  </div>
 
-                <button class="role-btn"
-                        onclick="chooseRoles('challenge')">
-                    🎯<br>
-                    CHALLENGE
-                </button>
+  <h2 id="finalWinner"></h2>
 
-            </div>
+  <div id="finalScore" class="final-score"></div>
 
-            <button class="main-btn"
-                    onclick="continueAfterRoles()">
-                CONTINUE
-            </button>
+  <div id="history" class="round-history"></div>
 
-        </div>
+  <button id="rematch" class="primary">
+    🔄 PLAY AGAIN
+  </button>
 
-    </section>
-
-
-    <!-- MATCH WINNER -->
-    <section id="winnerScreen" class="hidden">
-
-        <div class="logo">RACERUSH</div>
-
-        <div class="card winner">
-
-            <div class="trophy">🏆</div>
-
-            <div style="color:#9eabc7">
-                MATCH WINNER
-            </div>
-
-            <div id="winnerName"
-                 class="winner-name">
-            </div>
-
-            <div id="finalScore"
-                 class="final-score">
-            </div>
-
-            <button class="main-btn"
-                    onclick="location.reload()">
-                PLAY AGAIN 🚀
-            </button>
-
-        </div>
-
-    </section>
+</section>
 
 </div>
 
 
 <script>
 
-/* =========================
-   GAME STATE
-========================= */
+let players = ["Player 1","Player 2"];
 
-let winningScore = 5;
-let difficulty = "easy";
+let score = [0,0];
 
-let maxNumber = 25;
+let round = 1;
 
-let score1 = 0;
-let score2 = 0;
+const TOTAL_ROUNDS = 5;
 
-let roundNumber = 1;
+let firstPlayer = 0;
 
-let tossWinner = 1;
-let currentPlayer = 1;
+let currentPlayer = 0;
 
-let currentTarget = null;
-
-let numbers = [];
+let currentGame = "";
 
 let startTime = 0;
-let timerInterval = null;
 
-let selectedRole = null;
+let timer = null;
 
-let roundTimes = {
-    1: null,
-    2: null
-};
+let roundTimes = [null,null];
 
+let roundHistory = [];
 
-/* =========================
-   SCREEN CONTROL
-========================= */
+let tossChoice = null;
 
-function showScreen(id) {
+let tossWinner = null;
 
-    const screens = [
-        "homeScreen",
-        "tossScreen",
-        "firstPlayerScreen",
-        "gameScreen",
-        "roleScreen",
-        "winnerScreen"
-    ];
+let reactionReady = false;
 
-    screens.forEach(screen => {
-        document.getElementById(screen).classList.add("hidden");
-    });
+let reactionStart = 0;
 
-    document.getElementById(id).classList.remove("hidden");
+let memoryAnswer = "";
 
-    window.scrollTo(0,0);
-}
+let memoryInput = "";
 
 
 /* =========================
-   SETTINGS
+   SHORTCUT
 ========================= */
 
-function selectScore(score, button) {
-
-    winningScore = score;
-
-    document.querySelectorAll("#homeScreen .choice-btn")
-        .forEach(b => b.classList.remove("selected"));
-
-    button.classList.add("selected");
-}
-
-
-function selectDifficulty(level, button) {
-
-    difficulty = level;
-
-    if(level === "easy") {
-        maxNumber = 25;
-    }
-
-    if(level === "medium") {
-        maxNumber = 100;
-    }
-
-    if(level === "hard") {
-        maxNumber = 200;
-    }
-
-    document.querySelectorAll("#homeScreen .choice-btn")
-        .forEach(b => {
-            if(
-                b.innerText.includes("Easy") ||
-                b.innerText.includes("Medium") ||
-                b.innerText.includes("Hard")
-            ) {
-                b.classList.remove("selected");
-            }
-        });
-
-    button.classList.add("selected");
-}
+const $ = id => document.getElementById(id);
 
 
 /* =========================
-   COIN TOSS
+   PLAYER SETUP
 ========================= */
 
-function startToss() {
+$("startSetup").addEventListener("click", () => {
 
-    showScreen("tossScreen");
+  let p1 = $("player1Input").value.trim();
+  let p2 = $("player2Input").value.trim();
 
-    const coin = document.getElementById("coin");
-    const text = document.getElementById("tossText");
-    const button = document.getElementById("tossButton");
+  if(!p1){
+    p1 = "Player 1";
+  }
 
-    button.classList.add("hidden");
+  if(!p2){
+    p2 = "Player 2";
+  }
 
-    coin.classList.remove("flip");
+  players[0] = p1;
+  players[1] = p2;
 
-    void coin.offsetWidth;
+  $("setup").classList.add("hidden");
+  $("toss").classList.remove("hidden");
 
-    coin.classList.add("flip");
+  $("tossInfo").textContent =
+    `${players[0]} vs ${players[1]} • 5 ROUNDS`;
 
-    text.innerText = "The coin is in the air...";
+  $("tossInstruction").textContent =
+    `${players[0]}, choose Heads or Tails.`;
 
-    setTimeout(() => {
+});
 
-        tossWinner = Math.random() < 0.5 ? 1 : 2;
 
-        coin.innerText =
-            tossWinner === 1 ? "P1" : "P2";
+/* =========================
+   TOSS
+========================= */
 
-        text.innerText =
-            "Player " + tossWinner +
-            " won the toss!";
+$("headsBtn").addEventListener("click", () => {
 
-        button.classList.remove("hidden");
+  tossChoice = "Heads";
 
-    }, 900);
+  flipCoin();
+
+});
+
+$("tailsBtn").addEventListener("click", () => {
+
+  tossChoice = "Tails";
+
+  flipCoin();
+
+});
+
+
+function flipCoin(){
+
+  $("headsBtn").disabled = true;
+  $("tailsBtn").disabled = true;
+
+  $("coin").textContent = "🔄";
+
+  $("tossInstruction").textContent =
+    `${players[0]} chose ${tossChoice}. Flipping...`;
+
+  setTimeout(() => {
+
+    const result =
+      Math.random() < 0.5 ? "Heads" : "Tails";
+
+    $("coin").textContent =
+      result === "Heads" ? "🙂" : "🔵";
+
+    if(result === tossChoice){
+
+      tossWinner = 0;
+
+    }else{
+
+      tossWinner = 1;
+
+    }
+
+    $("tossResult").textContent =
+      `${result}! ${players[tossWinner]} won the toss!`;
+
+    $("winnerChoiceText").textContent =
+      `${players[tossWinner]}, choose who goes first.`;
+
+    $("p1First").textContent =
+      `${players[0]} goes first`;
+
+    $("p2First").textContent =
+      `${players[1]} goes first`;
+
+    $("firstChoice").classList.remove("hidden");
+
+  },1000);
+
 }
 
 
@@ -716,208 +583,607 @@ function startToss() {
    FIRST PLAYER
 ========================= */
 
-function chooseFirstPlayer() {
+$("p1First").addEventListener("click", () => {
 
-    showScreen("firstPlayerScreen");
+  beginGame(0);
 
-    document.getElementById("tossWinnerText").innerText =
-        "Player " + tossWinner +
-        " won the toss and gets to decide who goes first.";
-}
+});
 
+$("p2First").addEventListener("click", () => {
 
-function setFirstPlayer(player) {
+  beginGame(1);
 
-    currentPlayer = player;
-
-    roundNumber = 1;
-
-    score1 = 0;
-    score2 = 0;
-
-    updateScores();
-
-    startRound();
-}
+});
 
 
-/* =========================
-   ROUND START
-========================= */
+function beginGame(player){
 
-function startRound() {
+  firstPlayer = player;
 
-    showScreen("gameScreen");
+  currentPlayer = player;
 
-    roundTimes[1] = null;
-    roundTimes[2] = null;
+  $("toss").classList.add("hidden");
 
-    document.getElementById("roundInfo").innerText =
-        "ROUND " + roundNumber +
-        " • FIRST TO " + winningScore;
+  $("play").classList.remove("hidden");
 
-    document.getElementById("turnPlayer").innerText =
-        "PLAYER " + currentPlayer + "'S TURN";
+  updateScore();
 
-    startNumberChallenge();
+  startTurn();
+
 }
 
 
 /* =========================
-   NUMBER GENERATION
+   SCORE
 ========================= */
 
-function generateNumbers() {
+function updateScore(){
 
-    numbers = [];
+  $("p1NameScore").textContent = players[0];
 
-    for(let i = 1; i <= maxNumber; i++) {
-        numbers.push(i);
-    }
+  $("p2NameScore").textContent = players[1];
 
-    /* Fisher-Yates shuffle */
+  $("s1").textContent = score[0];
 
-    for(let i = numbers.length - 1; i > 0; i--) {
+  $("s2").textContent = score[1];
 
-        const j =
-            Math.floor(Math.random() * (i + 1));
+  $("roundLabel").textContent =
+    `Round ${round} / ${TOTAL_ROUNDS}`;
 
-        [numbers[i], numbers[j]] =
-            [numbers[j], numbers[i]];
-    }
 }
 
 
 /* =========================
-   NUMBER CHALLENGE
+   START TURN
 ========================= */
 
-function startNumberChallenge() {
+function startTurn(){
 
-    generateNumbers();
+  clearInterval(timer);
 
-    currentTarget =
-        numbers[Math.floor(Math.random() * numbers.length)];
+  roundTimes[currentPlayer] = null;
 
-    document.getElementById("targetNumber").innerText =
-        currentTarget;
+  updateScore();
 
-    const board =
-        document.getElementById("numberBoard");
+  $("msg").textContent =
+    `${players[currentPlayer]}'s turn`;
 
-    board.innerHTML = "";
+  startTime = performance.now();
 
-    numbers.forEach(number => {
-
-        const button =
-            document.createElement("button");
-
-        button.className = "number-btn";
-
-        button.innerText = number;
-
-        button.onclick = () =>
-            numberClicked(number, button);
-
-        board.appendChild(button);
-    });
-
-    document.getElementById("gameMessage").innerText =
-        "Find " + currentTarget + " as fast as you can.";
-
-    startTimer();
-}
-
-
-/* =========================
-   TIMER
-========================= */
-
-function startTimer() {
-
-    clearInterval(timerInterval);
-
-    startTime = performance.now();
-
-    const timer =
-        document.getElementById("timer");
-
-    timer.innerText = "0.00";
-
-    timer.className = "timer";
-
-    timerInterval = setInterval(() => {
-
-        const elapsed =
-            (performance.now() - startTime) / 1000;
-
-        timer.innerText =
-            elapsed.toFixed(2);
-
-        if(elapsed > 5) {
-            timer.classList.add("warning");
-        }
-
-        if(elapsed > 10) {
-            timer.classList.remove("warning");
-            timer.classList.add("danger");
-        }
-
-    }, 20);
-}
-
-
-/* =========================
-   NUMBER CLICK
-========================= */
-
-function numberClicked(number, button) {
-
-    if(number !== currentTarget) {
-
-        button.classList.add("wrong");
-
-        setTimeout(() => {
-            button.classList.remove("wrong");
-        }, 250);
-
-        return;
-    }
-
-    clearInterval(timerInterval);
+  timer = setInterval(() => {
 
     const elapsed =
-        (performance.now() - startTime) / 1000;
+      (performance.now() - startTime) / 1000;
 
-    button.classList.add("correct");
+    $("timer").textContent =
+      elapsed.toFixed(2);
 
-    roundTimes[currentPlayer] = elapsed;
+  },20);
 
-    document.getElementById("gameMessage").innerText =
-        "⚡ " +
-        elapsed.toFixed(2) +
-        " seconds!";
+  chooseMiniGame();
 
-    setTimeout(() => {
+}
 
-        /* First player finishes */
 
-        if(currentPlayer === 1) {
+/* =========================
+   MINI GAME SELECTION
+========================= */
 
-            currentPlayer = 2;
+function chooseMiniGame(){
 
-            document.getElementById("turnPlayer").innerText =
-                "PLAYER 2'S TURN";
+  const games = [
+    "hunt",
+    "math",
+    "reaction",
+    "odd",
+    "memory"
+  ];
 
-            startNumberChallenge();
+  currentGame =
+    games[Math.floor(Math.random()*games.length)];
 
-        } else {
+  if(currentGame === "hunt"){
 
-            finishRound();
+    numberHunt();
+
+  }
+
+  else if(currentGame === "math"){
+
+    quickMath();
+
+  }
+
+  else if(currentGame === "reaction"){
+
+    reactionGame();
+
+  }
+
+  else if(currentGame === "odd"){
+
+    oddOneOut();
+
+  }
+
+  else{
+
+    memoryGame();
+
+  }
+
+}
+
+
+/* =========================
+   FINISH TURN
+========================= */
+
+function finishTurn(){
+
+  clearInterval(timer);
+
+  const elapsed =
+    (performance.now() - startTime) / 1000;
+
+  roundTimes[currentPlayer] = elapsed;
+
+  $("timer").textContent =
+    elapsed.toFixed(2);
+
+  $("msg").textContent =
+    `${players[currentPlayer]} finished in ${elapsed.toFixed(2)} seconds`;
+
+  /*
+    Both players must complete the same round.
+  */
+
+  if(currentPlayer === firstPlayer){
+
+    currentPlayer = 1 - firstPlayer;
+
+    setTimeout(startTurn,800);
+
+  }else{
+
+    setTimeout(showRoundResult,700);
+
+  }
+
+}
+
+
+/* =========================
+   NUMBER HUNT
+========================= */
+
+function numberHunt(){
+
+  const numbers = [];
+
+  while(numbers.length < 18){
+
+    const n =
+      Math.floor(Math.random()*30)+1;
+
+    if(!numbers.includes(n)){
+
+      numbers.push(n);
+
+    }
+
+  }
+
+  const target =
+    numbers[Math.floor(Math.random()*numbers.length)];
+
+  $("task").innerHTML = `
+
+    <div class="card">
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+      ">
+
+        <h2>🔎 Number Hunt</h2>
+
+        <span class="pill">
+          FIND ${target}
+        </span>
+
+      </div>
+
+      <p class="small">
+        Find the target number as quickly as possible.
+      </p>
+
+      <div id="huntBoard" class="hunt"></div>
+
+    </div>
+
+  `;
+
+  const board = $("huntBoard");
+
+  numbers.forEach(number => {
+
+    const button =
+      document.createElement("button");
+
+    button.className = "num";
+
+    button.textContent = number;
+
+    /*
+      Keep the complete button inside the screen.
+    */
+
+    const left =
+      Math.random()*84 + 4;
+
+    const top =
+      Math.random()*78 + 5;
+
+    button.style.left = left + "%";
+
+    button.style.top = top + "%";
+
+    const rotation =
+      Math.random()*36 - 18;
+
+    button.style.transform =
+      `rotate(${rotation}deg)`;
+
+    const scale =
+      0.85 + Math.random()*0.35;
+
+    button.style.fontSize =
+      `${13*scale}px`;
+
+    button.addEventListener("click",() => {
+
+      if(number === target){
+
+        finishTurn();
+
+      }else{
+
+        button.disabled = true;
+
+      }
+
+    });
+
+    board.appendChild(button);
+
+  });
+
+}
+
+
+/* =========================
+   QUICK MATH
+========================= */
+
+function quickMath(){
+
+  const a =
+    Math.floor(Math.random()*15)+1;
+
+  const b =
+    Math.floor(Math.random()*15)+1;
+
+  const operators = ["+","-","×"];
+
+  const op =
+    operators[Math.floor(Math.random()*operators.length)];
+
+  let answer;
+
+  if(op === "+") answer = a+b;
+
+  if(op === "-") answer = a-b;
+
+  if(op === "×") answer = a*b;
+
+  let options = [answer];
+
+  while(options.length < 4){
+
+    const wrong =
+      answer + Math.floor(Math.random()*11)-5;
+
+    if(!options.includes(wrong)){
+
+      options.push(wrong);
+
+    }
+
+  }
+
+  options.sort(() => Math.random()-0.5);
+
+  $("task").innerHTML = `
+
+    <div class="card center">
+
+      <h2>🧮 Quick Math</h2>
+
+      <div class="math-question">
+        ${a} ${op} ${b} = ?
+      </div>
+
+      <div class="grid" id="mathOptions"></div>
+
+    </div>
+
+  `;
+
+  options.forEach(value => {
+
+    const button =
+      document.createElement("button");
+
+    button.textContent = value;
+
+    button.addEventListener("click",() => {
+
+      if(value === answer){
+
+        finishTurn();
+
+      }else{
+
+        button.disabled = true;
+
+      }
+
+    });
+
+    $("mathOptions").appendChild(button);
+
+  });
+
+}
+
+
+/* =========================
+   REACTION TAP
+========================= */
+
+function reactionGame(){
+
+  reactionReady = false;
+
+  $("task").innerHTML = `
+
+    <div class="card center">
+
+      <h2>⚡ Reaction Tap</h2>
+
+      <p class="small">
+        Wait for GO. Tap immediately.
+      </p>
+
+      <div id="reactionBox" class="reaction-box">
+        WAIT...
+      </div>
+
+    </div>
+
+  `;
+
+  const box = $("reactionBox");
+
+  box.addEventListener("click",() => {
+
+    if(!reactionReady){
+
+      $("msg").textContent =
+        "Too early! Wait for GO.";
+
+      return;
+
+    }
+
+    finishTurn();
+
+  });
+
+  const delay =
+    1000 + Math.random()*2500;
+
+  setTimeout(() => {
+
+    reactionReady = true;
+
+    reactionStart = performance.now();
+
+    box.textContent = "🚀 GO!";
+
+  },delay);
+
+}
+
+
+/* =========================
+   ODD ONE OUT
+========================= */
+
+function oddOneOut(){
+
+  const shapes = [
+    "🔵",
+    "🔴",
+    "🟢",
+    "🟡"
+  ];
+
+  const common =
+    shapes[Math.floor(Math.random()*shapes.length)];
+
+  let odd =
+    shapes[Math.floor(Math.random()*shapes.length)];
+
+  while(odd === common){
+
+    odd =
+      shapes[Math.floor(Math.random()*shapes.length)];
+
+  }
+
+  const oddIndex =
+    Math.floor(Math.random()*12);
+
+  $("task").innerHTML = `
+
+    <div class="card center">
+
+      <h2>👀 Odd One Out</h2>
+
+      <p class="small">
+        Tap the different shape.
+      </p>
+
+      <div id="oddGrid" class="odd-grid"></div>
+
+    </div>
+
+  `;
+
+  for(let i=0;i<12;i++){
+
+    const button =
+      document.createElement("button");
+
+    button.className = "shape-button";
+
+    button.textContent =
+      i === oddIndex ? odd : common;
+
+    button.addEventListener("click",() => {
+
+      if(i === oddIndex){
+
+        finishTurn();
+
+      }else{
+
+        button.disabled = true;
+
+      }
+
+    });
+
+    $("oddGrid").appendChild(button);
+
+  }
+
+}
+
+
+/* =========================
+   MEMORY GAME
+========================= */
+
+function memoryGame(){
+
+  const symbols =
+    ["🍎","🍌","🍇","🍊","🍉","🥝"];
+
+  const sequence = [];
+
+  for(let i=0;i<4;i++){
+
+    sequence.push(
+      symbols[Math.floor(Math.random()*symbols.length)]
+    );
+
+  }
+
+  memoryAnswer =
+    sequence.join("");
+
+  $("task").innerHTML = `
+
+    <div class="card center">
+
+      <h2>🧠 Memory Pattern</h2>
+
+      <p class="small">
+        Memorize the pattern.
+      </p>
+
+      <div id="memorySequence" class="memory-sequence">
+        ${memoryAnswer}
+      </div>
+
+      <div id="memoryControls" class="hidden">
+
+        <p class="small">
+          Repeat the pattern in the correct order.
+        </p>
+
+        <div class="grid" id="memoryButtons"></div>
+
+        <p id="memoryInput" class="result"></p>
+
+      </div>
+
+    </div>
+
+  `;
+
+  setTimeout(() => {
+
+    $("memorySequence").textContent =
+      "❓ ❓ ❓ ❓";
+
+    $("memoryControls").classList.remove("hidden");
+
+    symbols.forEach(symbol => {
+
+      const button =
+        document.createElement("button");
+
+      button.textContent = symbol;
+
+      button.addEventListener("click",() => {
+
+        memoryInput += symbol;
+
+        $("memoryInput").textContent =
+          memoryInput;
+
+        if(memoryInput.length === memoryAnswer.length){
+
+          if(memoryInput === memoryAnswer){
+
+            finishTurn();
+
+          }else{
+
+            $("msg").textContent =
+              "Wrong pattern. Try again.";
+
+            memoryInput = "";
+
+            $("memoryInput").textContent = "";
+
+          }
 
         }
 
-    }, 600);
+      });
+
+      $("memoryButtons").appendChild(button);
+
+    });
+
+  },1800);
+
 }
 
 
@@ -925,147 +1191,196 @@ function numberClicked(number, button) {
    ROUND RESULT
 ========================= */
 
-function finishRound() {
+function showRoundResult(){
 
-    clearInterval(timerInterval);
+  $("play").classList.add("hidden");
 
-    const time1 = roundTimes[1];
-    const time2 = roundTimes[2];
+  $("roundResult").classList.remove("hidden");
 
-    let winner;
+  const p1Time = roundTimes[0];
 
-    if(time1 < time2) {
-        winner = 1;
-        score1++;
-    } else {
-        winner = 2;
-        score2++;
-    }
+  const p2Time = roundTimes[1];
 
-    updateScores();
+  let winner = -1;
 
-    document.getElementById("roundInfo").innerText =
-        "ROUND COMPLETE";
+  if(p1Time < p2Time){
 
-    document.getElementById("turnPlayer").innerText =
-        "PLAYER " + winner + " WINS!";
+    winner = 0;
 
-    document.getElementById("gameMessage").innerText =
-        "Player 1: " + time1.toFixed(2) +
-        "s  •  Player 2: " + time2.toFixed(2) + "s";
+  }else if(p2Time < p1Time){
 
-    /* Match finished */
+    winner = 1;
 
-    if(score1 >= winningScore ||
-       score2 >= winningScore) {
+  }
 
-        setTimeout(() => {
-            showMatchWinner();
-        }, 1000);
+  if(winner >= 0){
 
-        return;
-    }
+    score[winner]++;
 
-    /* Round winner chooses roles */
+    $("roundWinner").textContent =
+      `🏆 ${players[winner]} wins Round ${round}!`;
 
-    setTimeout(() => {
+  }else{
 
-        showScreen("roleScreen");
+    $("roundWinner").textContent =
+      "🤝 Round Draw!";
 
-        document.getElementById("roundWinnerText").innerText =
-            "Player " + winner +
-            " won the round and gets to choose the roles.";
+  }
 
-        window.nextRoundWinner = winner;
+  $("roundTimes").innerHTML = `
 
-    }, 1000);
+    ${players[0]}:
+    <b>${p1Time.toFixed(2)}s</b>
+
+    &nbsp; • &nbsp;
+
+    ${players[1]}:
+    <b>${p2Time.toFixed(2)}s</b>
+
+  `;
+
+  roundHistory.push({
+
+    round:round,
+
+    winner:winner,
+
+    p1:p1Time,
+
+    p2:p2Time
+
+  });
+
 }
 
 
 /* =========================
-   ROLE SELECTION
+   NEXT ROUND
 ========================= */
 
-function chooseRoles(role) {
+$("nextRound").addEventListener("click",() => {
 
-    selectedRole = role;
+  $("roundResult").classList.add("hidden");
 
-    document.querySelectorAll(".role-btn")
-        .forEach(button =>
-            button.classList.remove("selected")
-        );
+  /*
+    Round 5 is complete.
+    Go directly to final result.
+  */
 
-    event.currentTarget.classList.add("selected");
-}
+  if(round >= TOTAL_ROUNDS){
+
+    showFinalResult();
+
+    return;
+
+  }
+
+  round++;
+
+  /*
+    Alternate who starts each round.
+  */
+
+  firstPlayer =
+    1 - firstPlayer;
+
+  currentPlayer =
+    firstPlayer;
+
+  $("play").classList.remove("hidden");
+
+  startTurn();
+
+});
 
 
-function continueAfterRoles() {
+/* =========================
+   FINAL RESULT
+========================= */
 
-    if(!selectedRole) {
+function showFinalResult(){
 
-        alert("Choose a role first.");
+  clearInterval(timer);
 
-        return;
-    }
+  $("roundResult").classList.add("hidden");
 
-    selectedRole = null;
+  $("play").classList.add("hidden");
 
-    roundNumber++;
+  $("finalResult").classList.remove("hidden");
 
-    /*
-       The winner of the previous round
-       gets the choice of who starts the
-       next round.
-    */
+  let winner = -1;
 
-    currentPlayer = window.nextRoundWinner;
+  if(score[0] > score[1]){
 
-    startRound();
+    winner = 0;
+
+  }else if(score[1] > score[0]){
+
+    winner = 1;
+
+  }
+
+  if(winner >= 0){
+
+    $("finalWinner").textContent =
+      `🏆 ${players[winner]} WINS RACERUSH!`;
+
+  }else{
+
+    $("finalWinner").textContent =
+      "🤝 RACERUSH ENDS IN A DRAW!";
+
+  }
+
+  $("finalScore").textContent =
+    `${score[0]} — ${score[1]}`;
+
+  let html = "";
+
+  roundHistory.forEach(item => {
+
+    let winnerText =
+      item.winner === -1
+      ? "Draw"
+      : players[item.winner];
+
+    html += `
+
+      <div class="round-row">
+
+        <span>
+          Round ${item.round}
+        </span>
+
+        <span>
+          ${winnerText}
+        </span>
+
+        <span>
+          ${item.p1.toFixed(2)}s /
+          ${item.p2.toFixed(2)}s
+        </span>
+
+      </div>
+
+    `;
+
+  });
+
+  $("history").innerHTML = html;
+
 }
 
 
 /* =========================
-   SCOREBOARD
+   REMATCH
 ========================= */
 
-function updateScores() {
+$("rematch").addEventListener("click",() => {
 
-    document.getElementById("score1").innerText =
-        score1;
+  location.reload();
 
-    document.getElementById("score2").innerText =
-        score2;
-}
-
-
-/* =========================
-   MATCH WINNER
-========================= */
-
-function showMatchWinner() {
-
-    clearInterval(timerInterval);
-
-    const winner =
-        score1 >= winningScore ? 1 : 2;
-
-    showScreen("winnerScreen");
-
-    document.getElementById("winnerName").innerText =
-        "PLAYER " + winner;
-
-    document.getElementById("finalScore").innerText =
-        score1 + " — " + score2;
-}
-
-
-/* =========================
-   PREVENT DOUBLE TAP
-========================= */
-
-document.addEventListener("dblclick", function(e) {
-    e.preventDefault();
-}, { passive:false });
+});
 
 </script>
 
