@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>RaceRush</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top, #243b67 0%, #10182b 45%, #070b15 100%);
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+}
+
+#app {
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+    padding: 18px;
+    min-height: 100vh;
+}
+
+/* HEADER */
+
+.logo {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin: 12px 0 4px;
+    color: #65d8ff;
+    text-shadow:
+        0 0 10px rgba(101,216,255,.7),
+        0 0 30px rgba(101,216,255,.25);
+}
+
+.subtitle {
+    text-align: center;
+    color: #9eabc7;
+    margin-bottom: 25px;
+}
+
+/* CARDS */
+
+.card {
+    background: rgba(20, 29, 51, .94);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.25);
+}
+
+h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+/* BUTTONS */
+
+.main-btn {
+    width: 100%;
+    padding: 17px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #19c8ff, #3978ff);
+    color: white;
+    font-size: 19px;
+    font-weight: 800;
+    margin-top: 12px;
+    box-shadow: 0 7px 20px rgba(25,200,255,.25);
+}
+
+.main-btn:active {
+    transform: scale(.97);
+}
+
+.secondary-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    background: #29344f;
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.choice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.choice-btn {
+    padding: 18px 10px;
+    border-radius: 15px;
+    background: #26334f;
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    border: 2px solid transparent;
+}
+
+.choice-btn.selected {
+    background: linear-gradient(135deg, #16c6ff, #386eff);
+    border-color: #82e7ff;
+}
+
+/* SCORE */
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.player-score {
+    background: #18233c;
+    padding: 15px;
+    border-radius: 18px;
+    text-align: center;
+}
+
+.player-name {
+    color: #aebbd5;
+    font-size: 14px;
+}
+
+.score {
+    font-size: 38px;
+    font-weight: 900;
+    margin-top: 3px;
+}
+
+/* TIMER */
+
+.timer {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 900;
+    margin: 10px 0 18px;
+    color: #65d8ff;
+}
+
+.timer.warning {
+    color: #ffb84d;
+}
+
+.timer.danger {
+    color: #ff5964;
+}
+
+/* NUMBER BOARD */
+
+.target-box {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.target-label {
+    color: #9eabc7;
+    font-size: 14px;
+}
+
+.target-number {
+    font-size: 54px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 15px rgba(101,216,255,.4);
+}
+
+.number-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+    background: #10192d;
+    padding: 10px;
+    border-radius: 18px;
+}
+
+.number-btn {
+    min-height: 54px;
+    border-radius: 11px;
+    background: #273653;
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+    transition: .12s;
+}
+
+.number-btn:active {
+    transform: scale(.90);
+}
+
+.number-btn.correct {
+    background: #20c982;
+    box-shadow: 0 0 14px rgba(32,201,130,.4);
+}
+
+.number-btn.wrong {
+    background: #ef4f5f;
+}
+
+/* COIN */
+
+.coin {
+    width: 130px;
+    height: 130px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: linear-gradient(145deg,#ffd86b,#e7a52c);
+    color: #5d3a00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+    border: 7px solid #fff0a5;
+    box-shadow:
+        0 0 30px rgba(255,196,54,.35),
+        inset 0 0 15px rgba(255,255,255,.6);
+}
+
+.coin.flip {
+    animation: flip .8s ease;
+}
+
+@keyframes flip {
+    0% { transform: rotateY(0); }
+    50% { transform: rotateY(900deg); }
+    100% { transform: rotateY(1800deg); }
+}
+
+/* ROLE */
+
+.role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.role-btn {
+    background: #273653;
+    color: white;
+    padding: 20px 8px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.role-btn.selected {
+    background: linear-gradient(135deg,#18c7a3,#168bd1);
+}
+
+/* MESSAGE */
+
+.message {
+    text-align: center;
+    padding: 14px;
+    border-radius: 14px;
+    background: #111b30;
+    color: #b9c5dc;
+    margin-top: 15px;
+    line-height: 1.45;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* WINNER */
+
+.winner {
+    text-align: center;
+}
+
+.trophy {
+    font-size: 70px;
+    margin: 5px 0;
+}
+
+.winner-name {
+    font-size: 34px;
+    font-weight: 900;
+    color: #ffd45c;
+}
+
+.final-score {
+    font-size: 22px;
+    color: #bdc9df;
+    margin: 10px 0 20px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:420px) {
+    #app {
+        padding: 12px;
+    }
+
+    .logo {
+        font-size: 36px;
+    }
+
+    .number-btn {
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    .target-number {
+        font-size: 46px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <!-- HOME -->
+    <section id="homeScreen">
+        <div class="logo">RACERUSH</div>
+        <div class="subtitle">Think fast. Tap faster. Win the race.</div>
+
+        <div class="card">
+            <h2>🏁 Start Match</h2>
+
+            <p style="text-align:center;color:#9eabc7">
+                Choose how many rounds are needed to win.
+            </p>
+
+            <div class="choice-grid">
+                <button class="choice-btn selected" onclick="selectScore(5,this)">
+                    First to 5
+                </button>
+
+                <button class="choice-btn" onclick="selectScore(10,this)">
+                    First to 10
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Difficulty</h2>
+
+            <div class="choice-grid">
+                <button class="choice-btn selected" onclick="selectDifficulty('easy',this)">
+                    Easy<br>
+                    <small>1–25</small>
+                </button>
+
+                <button class="choice-btn" onclick="selectDifficulty('medium',this)">
+                    Medium<br>
+                    <small>1–100</small>
+                </button>
+
+                <button class="choice-btn" onclick="selectDifficulty('hard',this)">
+                    Hard<br>
+                    <small>1–200</small>
+                </button>
+            </div>
+
+            <button class="main-btn" onclick="startToss()">
+                START RACERUSH 🚀
+            </button>
+        </div>
+    </section>
+
+
+    <!-- TOSS -->
+    <section id="tossScreen" class="hidden">
+
+        <div class="logo">RACERUSH</div>
+
+        <div class="card">
+            <h2>🪙 Coin Toss</h2>
+
+            <div id="coin" class="coin">
+                READY
+            </div>
+
+            <div id="tossText" class="message">
+                Tossing the coin...
+            </div>
+
+            <button id="tossButton" class="main-btn hidden" onclick="chooseFirstPlayer()">
+                CONTINUE
+            </button>
+        </div>
+
+    </section>
+
+
+    <!-- FIRST PLAYER -->
+    <section id="firstPlayerScreen" class="hidden">
+
+        <div class="logo">RACERUSH</div>
+
+        <div class="card">
+            <h2>👑 Who Goes First?</h2>
+
+            <div id="tossWinnerText" class="message"></div>
+
+            <p style="text-align:center;color:#9eabc7">
+                The toss winner chooses who starts the round.
+            </p>
+
+            <div class="choice-grid">
+                <button class="choice-btn" onclick="setFirstPlayer(1)">
+                    PLAYER 1
+                </button>
+
+                <button class="choice-btn" onclick="setFirstPlayer(2)">
+                    PLAYER 2
+                </button>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- GAME -->
+    <section id="gameScreen" class="hidden">
+
+        <div class="logo">RACERUSH</div>
+
+        <div class="scoreboard">
+
+            <div class="player-score">
+                <div class="player-name">PLAYER 1</div>
+                <div id="score1" class="score">0</div>
+            </div>
+
+            <div class="player-score">
+                <div class="player-name">PLAYER 2</div>
+                <div id="score2" class="score">0</div>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div id="roundInfo"
+                 style="text-align:center;color:#9eabc7;margin-bottom:8px">
+            </div>
+
+            <div id="turnPlayer"
+                 style="text-align:center;font-size:22px;font-weight:800">
+            </div>
+
+            <div id="timer" class="timer">
+                0.00
+            </div>
+
+            <div class="target-box">
+                <div class="target-label">
+                    FIND THIS NUMBER
+                </div>
+
+                <div id="targetNumber" class="target-number">
+                    -
+                </div>
+            </div>
+
+            <div id="numberBoard" class="number-board">
+            </div>
+
+            <div id="gameMessage" class="message">
+                Tap the correct numbers as quickly as possible.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ROLE SELECTION -->
+    <section id="roleScreen" class="hidden">
+
+        <div class="logo">RACERUSH</div>
+
+        <div class="card">
+
+            <h2>🏆 Round Winner</h2>
+
+            <div id="roundWinnerText"
+                 class="message">
+            </div>
+
+            <p style="text-align:center;color:#9eabc7">
+                The round winner chooses the starting roles.
+            </p>
+
+            <div class="role-grid">
+
+                <button class="role-btn"
+                        onclick="chooseRoles('normal')">
+                    ⚡<br>
+                    SPEED
+                </button>
+
+                <button class="role-btn"
+                        onclick="chooseRoles('challenge')">
+                    🎯<br>
+                    CHALLENGE
+                </button>
+
+            </div>
+
+            <button class="main-btn"
+                    onclick="continueAfterRoles()">
+                CONTINUE
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- MATCH WINNER -->
+    <section id="winnerScreen" class="hidden">
+
+        <div class="logo">RACERUSH</div>
+
+        <div class="card winner">
+
+            <div class="trophy">🏆</div>
+
+            <div style="color:#9eabc7">
+                MATCH WINNER
+            </div>
+
+            <div id="winnerName"
+                 class="winner-name">
+            </div>
+
+            <div id="finalScore"
+                 class="final-score">
+            </div>
+
+            <button class="main-btn"
+                    onclick="location.reload()">
+                PLAY AGAIN 🚀
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================
+   GAME STATE
+========================= */
+
+let winningScore = 5;
+let difficulty = "easy";
+
+let maxNumber = 25;
+
+let score1 = 0;
+let score2 = 0;
+
+let roundNumber = 1;
+
+let tossWinner = 1;
+let currentPlayer = 1;
+
+let currentTarget = null;
+
+let numbers = [];
+
+let startTime = 0;
+let timerInterval = null;
+
+let selectedRole = null;
+
+let roundTimes = {
+    1: null,
+    2: null
+};
+
+
+/* =========================
+   SCREEN CONTROL
+========================= */
+
+function showScreen(id) {
+
+    const screens = [
+        "homeScreen",
+        "tossScreen",
+        "firstPlayerScreen",
+        "gameScreen",
+        "roleScreen",
+        "winnerScreen"
+    ];
+
+    screens.forEach(screen => {
+        document.getElementById(screen).classList.add("hidden");
+    });
+
+    document.getElementById(id).classList.remove("hidden");
+
+    window.scrollTo(0,0);
+}
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+function selectScore(score, button) {
+
+    winningScore = score;
+
+    document.querySelectorAll("#homeScreen .choice-btn")
+        .forEach(b => b.classList.remove("selected"));
+
+    button.classList.add("selected");
+}
+
+
+function selectDifficulty(level, button) {
+
+    difficulty = level;
+
+    if(level === "easy") {
+        maxNumber = 25;
+    }
+
+    if(level === "medium") {
+        maxNumber = 100;
+    }
+
+    if(level === "hard") {
+        maxNumber = 200;
+    }
+
+    document.querySelectorAll("#homeScreen .choice-btn")
+        .forEach(b => {
+            if(
+                b.innerText.includes("Easy") ||
+                b.innerText.includes("Medium") ||
+                b.innerText.includes("Hard")
+            ) {
+                b.classList.remove("selected");
+            }
+        });
+
+    button.classList.add("selected");
+}
+
+
+/* =========================
+   COIN TOSS
+========================= */
+
+function startToss() {
+
+    showScreen("tossScreen");
+
+    const coin = document.getElementById("coin");
+    const text = document.getElementById("tossText");
+    const button = document.getElementById("tossButton");
+
+    button.classList.add("hidden");
+
+    coin.classList.remove("flip");
+
+    void coin.offsetWidth;
+
+    coin.classList.add("flip");
+
+    text.innerText = "The coin is in the air...";
+
+    setTimeout(() => {
+
+        tossWinner = Math.random() < 0.5 ? 1 : 2;
+
+        coin.innerText =
+            tossWinner === 1 ? "P1" : "P2";
+
+        text.innerText =
+            "Player " + tossWinner +
+            " won the toss!";
+
+        button.classList.remove("hidden");
+
+    }, 900);
+}
+
+
+/* =========================
+   FIRST PLAYER
+========================= */
+
+function chooseFirstPlayer() {
+
+    showScreen("firstPlayerScreen");
+
+    document.getElementById("tossWinnerText").innerText =
+        "Player " + tossWinner +
+        " won the toss and gets to decide who goes first.";
+}
+
+
+function setFirstPlayer(player) {
+
+    currentPlayer = player;
+
+    roundNumber = 1;
+
+    score1 = 0;
+    score2 = 0;
+
+    updateScores();
+
+    startRound();
+}
+
+
+/* =========================
+   ROUND START
+========================= */
+
+function startRound() {
+
+    showScreen("gameScreen");
+
+    roundTimes[1] = null;
+    roundTimes[2] = null;
+
+    document.getElementById("roundInfo").innerText =
+        "ROUND " + roundNumber +
+        " • FIRST TO " + winningScore;
+
+    document.getElementById("turnPlayer").innerText =
+        "PLAYER " + currentPlayer + "'S TURN";
+
+    startNumberChallenge();
+}
+
+
+/* =========================
+   NUMBER GENERATION
+========================= */
+
+function generateNumbers() {
+
+    numbers = [];
+
+    for(let i = 1; i <= maxNumber; i++) {
+        numbers.push(i);
+    }
+
+    /* Fisher-Yates shuffle */
+
+    for(let i = numbers.length - 1; i > 0; i--) {
+
+        const j =
+            Math.floor(Math.random() * (i + 1));
+
+        [numbers[i], numbers[j]] =
+            [numbers[j], numbers[i]];
+    }
+}
+
+
+/* =========================
+   NUMBER CHALLENGE
+========================= */
+
+function startNumberChallenge() {
+
+    generateNumbers();
+
+    currentTarget =
+        numbers[Math.floor(Math.random() * numbers.length)];
+
+    document.getElementById("targetNumber").innerText =
+        currentTarget;
+
+    const board =
+        document.getElementById("numberBoard");
+
+    board.innerHTML = "";
+
+    numbers.forEach(number => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "number-btn";
+
+        button.innerText = number;
+
+        button.onclick = () =>
+            numberClicked(number, button);
+
+        board.appendChild(button);
+    });
+
+    document.getElementById("gameMessage").innerText =
+        "Find " + currentTarget + " as fast as you can.";
+
+    startTimer();
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer() {
+
+    clearInterval(timerInterval);
+
+    startTime = performance.now();
+
+    const timer =
+        document.getElementById("timer");
+
+    timer.innerText = "0.00";
+
+    timer.className = "timer";
+
+    timerInterval = setInterval(() => {
+
+        const elapsed =
+            (performance.now() - startTime) / 1000;
+
+        timer.innerText =
+            elapsed.toFixed(2);
+
+        if(elapsed > 5) {
+            timer.classList.add("warning");
+        }
+
+        if(elapsed > 10) {
+            timer.classList.remove("warning");
+            timer.classList.add("danger");
+        }
+
+    }, 20);
+}
+
+
+/* =========================
+   NUMBER CLICK
+========================= */
+
+function numberClicked(number, button) {
+
+    if(number !== currentTarget) {
+
+        button.classList.add("wrong");
+
+        setTimeout(() => {
+            button.classList.remove("wrong");
+        }, 250);
+
+        return;
+    }
+
+    clearInterval(timerInterval);
+
+    const elapsed =
+        (performance.now() - startTime) / 1000;
+
+    button.classList.add("correct");
+
+    roundTimes[currentPlayer] = elapsed;
+
+    document.getElementById("gameMessage").innerText =
+        "⚡ " +
+        elapsed.toFixed(2) +
+        " seconds!";
+
+    setTimeout(() => {
+
+        /* First player finishes */
+
+        if(currentPlayer === 1) {
+
+            currentPlayer = 2;
+
+            document.getElementById("turnPlayer").innerText =
+                "PLAYER 2'S TURN";
+
+            startNumberChallenge();
+
+        } else {
+
+            finishRound();
+
+        }
+
+    }, 600);
+}
+
+
+/* =========================
+   ROUND RESULT
+========================= */
+
+function finishRound() {
+
+    clearInterval(timerInterval);
+
+    const time1 = roundTimes[1];
+    const time2 = roundTimes[2];
+
+    let winner;
+
+    if(time1 < time2) {
+        winner = 1;
+        score1++;
+    } else {
+        winner = 2;
+        score2++;
+    }
+
+    updateScores();
+
+    document.getElementById("roundInfo").innerText =
+        "ROUND COMPLETE";
+
+    document.getElementById("turnPlayer").innerText =
+        "PLAYER " + winner + " WINS!";
+
+    document.getElementById("gameMessage").innerText =
+        "Player 1: " + time1.toFixed(2) +
+        "s  •  Player 2: " + time2.toFixed(2) + "s";
+
+    /* Match finished */
+
+    if(score1 >= winningScore ||
+       score2 >= winningScore) {
+
+        setTimeout(() => {
+            showMatchWinner();
+        }, 1000);
+
+        return;
+    }
+
+    /* Round winner chooses roles */
+
+    setTimeout(() => {
+
+        showScreen("roleScreen");
+
+        document.getElementById("roundWinnerText").innerText =
+            "Player " + winner +
+            " won the round and gets to choose the roles.";
+
+        window.nextRoundWinner = winner;
+
+    }, 1000);
+}
+
+
+/* =========================
+   ROLE SELECTION
+========================= */
+
+function chooseRoles(role) {
+
+    selectedRole = role;
+
+    document.querySelectorAll(".role-btn")
+        .forEach(button =>
+            button.classList.remove("selected")
+        );
+
+    event.currentTarget.classList.add("selected");
+}
+
+
+function continueAfterRoles() {
+
+    if(!selectedRole) {
+
+        alert("Choose a role first.");
+
+        return;
+    }
+
+    selectedRole = null;
+
+    roundNumber++;
+
+    /*
+       The winner of the previous round
+       gets the choice of who starts the
+       next round.
+    */
+
+    currentPlayer = window.nextRoundWinner;
+
+    startRound();
+}
+
+
+/* =========================
+   SCOREBOARD
+========================= */
+
+function updateScores() {
+
+    document.getElementById("score1").innerText =
+        score1;
+
+    document.getElementById("score2").innerText =
+        score2;
+}
+
+
+/* =========================
+   MATCH WINNER
+========================= */
+
+function showMatchWinner() {
+
+    clearInterval(timerInterval);
+
+    const winner =
+        score1 >= winningScore ? 1 : 2;
+
+    showScreen("winnerScreen");
+
+    document.getElementById("winnerName").innerText =
+        "PLAYER " + winner;
+
+    document.getElementById("finalScore").innerText =
+        score1 + " — " + score2;
+}
+
+
+/* =========================
+   PREVENT DOUBLE TAP
+========================= */
+
+document.addEventListener("dblclick", function(e) {
+    e.preventDefault();
+}, { passive:false });
+
+</script>
+
+</body>
+</html>
