@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RaceRush</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:14px;background:#0b1020;color:#f4f6ff;font-family:system-ui,sans-serif}
+main{max-width:650px;margin:auto}
+.card{background:#151f36;border:1px solid #344563;border-radius:18px;padding:17px;margin:14px 0}
+h1{text-align:center;font-size:34px;margin:5px}
+h2{text-align:center;font-size:22px}
+p,.muted{color:#b6c3dc;text-align:center;font-size:14px}
+input{width:100%;padding:13px;border-radius:10px;border:1px solid #526384;background:#0e172b;color:white;font-size:16px;margin:5px 0 12px}
+button{border:1px solid #435579;border-radius:12px;padding:13px 9px;background:#253654;color:white;font-weight:700;font-size:15px;cursor:pointer;min-height:48px}
+button:disabled{opacity:.4}
+.primary{background:#718bff;border:0;color:white}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hidden{display:none!important}
+.center{text-align:center}
+.pill{display:inline-block;background:#2b3b5d;padding:6px 11px;border-radius:30px;font-size:12px}
+.score{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:bold}
+.timer{text-align:center;font-size:38px;font-weight:900;color:#ffd166;margin:10px}
+.mission{text-align:center;font-size:23px;font-weight:900;margin:15px 0 8px}
+.numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:14px}
+.num{padding:9px 0;font-size:20px;min-width:0}
+.correct{background:#176745!important}
+.wrong{background:#792f42!important}
+.result{font-size:24px;font-weight:900;text-align:center;margin:16px 0}
+.times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.timebox{background:#253654;padding:12px;border-radius:12px;text-align:center}
+.timebox strong{display:block;font-size:21px;margin-top:6px}
+.memory{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:330px;margin:18px auto}
+.tile{aspect-ratio:1;font-size:25px;padding:0}
+.tile.lit{background:#ffd166;color:#17213a}
+.big{font-size:48px;text-align:center;margin:12px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.word{font-size:30px;letter-spacing:4px;text-align:center;margin:18px}
+</style>
+</head>
+<body>
+<main>
+<h1>⚡ RACERUSH</h1>
+<p>Think fast. Play smart. Beat your rival.</p>
+
+<section id="setup" class="card">
+<h2>Meet the players</h2>
+<label>Player 1 name</label>
+<input id="name1" value="Player 1" maxlength="20">
+<label>Player 2 name</label>
+<input id="name2" value="Player 2" maxlength="20">
+<h2>Choose difficulty</h2>
+<div class="grid">
+<button onclick="setDifficulty('Easy')">🟢 Easy</button>
+<button onclick="setDifficulty('Medium')">🟡 Medium</button>
+<button onclick="setDifficulty('Hard')">🔴 Hard</button>
+<button onclick="setDifficulty('Expert')">🔥 Expert</button>
+</div>
+<p id="difficultyLabel">Selected: Easy</p>
+<button class="primary" style="width:100%" onclick="startToss()">START 5-ROUND MATCH</button>
+</section>
+
+<section id="toss" class="card hidden center">
+<span class="pill">COIN TOSS</span>
+<h2 id="tossTitle"></h2>
+<div class="grid" id="coinButtons">
+<button onclick="pickSide('heads')">🪙 HEADS</button>
+<button onclick="pickSide('tails')">🪙 TAILS</button>
+</div>
+<div id="coin" class="big hidden">🪙</div>
+<p id="tossResult"></p>
+<div id="tossNext" class="hidden">
+<h2 id="tossWinner"></h2>
+<p>Choose who plays first.</p>
+<div class="grid">
+<button id="winnerFirst" class="primary" onclick="beginMatch(true)"></button>
+<button id="opponentFirst" onclick="beginMatch(false)"></button>
+</div>
+</div>
+</section>
+
+<section id="game" class="card hidden">
+<div class="score"><span id="p1score"></span><span id="roundLabel"></span><span id="p2score"></span></div>
+<div class="timer" id="timer">0.00s</div>
+<p id="turnLabel"></p>
+<div id="challenge"></div>
+<p id="feedback"></p>
+</section>
+
+<section id="result" class="card hidden center">
+<span class="pill">ROUND RESULTS</span>
+<div id="roundWinner" class="result"></div>
+<div class="times">
+<div class="timebox"><span id="timeName1"></span><strong id="time1"></strong><small id="gameName1"></small></div>
+<div class="timebox"><span id="timeName2"></span><strong id="time2"></strong><small id="gameName2"></small></div>
+</div>
+<p id="scoreSummary"></p>
+<div id="nextChoice">
+<h2>Who plays first next round?</h2>
+<p id="choiceHint"></p>
+<div class="grid">
+<button id="nextP1" onclick="nextRound(0)"></button>
+<button id="nextP2" onclick="nextRound(1)"></button>
+</div>
+</div>
+<button id="finishButton" class="primary hidden" style="width:100%;margin-top:12px" onclick="showFinal()">SEE FINAL RESULT</button>
+</section>
+
+<section id="finished" class="card hidden center">
+<div class="big">🏆</div>
+<h2 id="champion"></h2>
+<p id="finalScore"></p>
+<div id="history"></div>
+<button class="primary" style="width:100%" onclick="location.reload()">PLAY AGAIN</button>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let names=['Player 1','Player 2'],difficulty='Easy';
+let maxNum=25,count=16,scores=[0,0],round=1,firstPlayer=0,current=0;
+let times=[0,0],started=0,clock=null,active=false;
+let challenges=[null,null],roundGames=['',''];
+let tossSide='',tossWinnerIndex=0,roundHistory=[],memoryAnswers=[],memoryPhase=false;
+
+function setDifficulty(d){
+ difficulty=d;
+ maxNum={Easy:25,Medium:100,Hard:200,Expert:500}[d];
+ count={Easy:16,Medium:24,Hard:32,Expert:36}[d];
+ $('difficultyLabel').textContent='Selected: '+d;
+}
+function show(id){$(id).classList.remove('hidden')}
+function hide(id){$(id).classList.add('hidden')}
+function shuffle(a){
+ for(let i=a.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function startToss(){
+ names=[$('name1').value.trim()||'Player 1',$('name2').value.trim()||'Player 2'];
+ if(names[0].toLowerCase()===names[1].toLowerCase()){
+  alert('Please enter different names for both players.');return;
+ }
+ hide('setup');show('toss');
+ $('tossTitle').textContent=names[0]+', choose Heads or Tails';
+ $('tossResult').textContent='';
+ hide('coin');hide('tossNext');show('coinButtons');
+ document.querySelectorAll('#coinButtons button').forEach(b=>b.disabled=false);
+}
+function pickSide(side){
+ tossSide=side;
+ document.querySelectorAll('#coinButtons button').forEach(b=>b.disabled=true);
+ $('tossTitle').textContent='Flipping the coin...';show('coin');
+ setTimeout(()=>{
+  let result=Math.random()<.5?'heads':'tails';
+  tossWinnerIndex=result===tossSide?0:1;
+  $('coin').textContent=result==='heads'?'👑':'🦅';
+  $('tossResult').textContent='Result: '+result.toUpperCase()+' — '+names[tossWinnerIndex]+' wins the toss!';
+  $('tossWinner').textContent=names[tossWinnerIndex]+' chooses who plays first.';
+  $('winnerFirst').textContent=names[tossWinnerIndex]+' plays first';
+  $('opponentFirst').textContent=names[1-tossWinnerIndex]+' plays first';
+  show('tossNext');
+ },700);
+}
+function beginMatch(winnerFirst){
+ firstPlayer=winnerFirst?tossWinnerIndex:1-tossWinnerIndex;
+ current=firstPlayer;round=1;scores=[0,0];roundHistory=[];
+ hide('toss');show('game');startRound();
+}
+function prime(n){
+ if(n<2)return false;
+ for(let i=2;i*i<=n;i++)if(n%i===0)return false;
+ return true;
+}
+function makeNumber(){
+ let tasks=['highestOdd','lowestEven','largest','smallest','secondHighest','highestEven','lowestOdd','divisible3','prime'];
+ let type=tasks[Math.floor(Math.random()*tasks.length)];
+ let nums=new Set();
+ while(nums.size<count)nums.add(1+Math.floor(Math.random()*maxNum));
+ let arr=[...nums],answer,prompt='';
+ if(type==='highestOdd'){
+  prompt='Find the HIGHEST ODD number';answer=Math.max(...arr.filter(n=>n%2));
+ }else if(type==='lowestEven'){
+  prompt='Find the LOWEST EVEN number';answer=Math.min(...arr.filter(n=>n%2===0));
+ }else if(type==='largest'){
+  prompt='Find the LARGEST number';answer=Math.max(...arr);
+ }else if(type==='smallest'){
+  prompt='Find the SMALLEST number';answer=Math.min(...arr);
+ }else if(type==='secondHighest'){
+  prompt='Find the SECOND-HIGHEST number';answer=[...arr].sort((a,b)=>b-a)[1];
+ }else if(type==='highestEven'){
+  prompt='Find the HIGHEST EVEN number';answer=Math.max(...arr.filter(n=>n%2===0));
+ }else if(type==='lowestOdd'){
+  prompt='Find the LOWEST ODD number';answer=Math.min(...arr.filter(n=>n%2));
+ }else if(type==='divisible3'){
+  prompt='Find the LARGEST number divisible by 3';
+  arr=arr.filter(n=>n%3===0);
+  while(arr.length<count){let n=3*(1+Math.floor(Math.random()*Math.floor(maxNum/3)));if(!arr.includes(n))arr.push(n);}
+  arr=arr.slice(0,count);answer=Math.max(...arr);
+ }else{
+  prompt='Find the HIGHEST PRIME number';
+  arr=arr.filter(prime);
+  while(arr.length<count){let n=2+Math.floor(Math.random()*maxNum);if(prime(n)&&!arr.includes(n))arr.push(n);}
+  arr=arr.slice(0,count);answer=Math.max(...arr);
+ }
+ return {type:'numbers',name:'Number Hunt',prompt,nums:shuffle(arr),answer};
+}
+function makeMemory(){
+ let len={Easy:3,Medium:4,Hard:5,Expert:6}[difficulty],seq=[];
+ while(seq.length<len){let n=Math.floor(Math.random()*9);if(!seq.includes(n))seq.push(n);}
+ return {type:'memory',name:'Memory Rush',sequence:seq};
+}
+function makePattern(){
+ const patterns=[
+  {prompt:'What comes next? 🔴 🔵 🔴 🔵 ?',answer:'🔴',opts:['🔴','🟢','🟡','🟣']},
+  {prompt:'Continue: ⭐ ⭐ 🌙 ⭐ ⭐ ?',answer:'🌙',opts:['🌙','☀️','⭐','⚡']},
+  {prompt:'What comes next? 🔺 🔵 🟩 🔺 🔵 ?',answer:'🟩',opts:['🔺','🔵','🟩','🟡']}
+ ];
+ let p=patterns[Math.floor(Math.random()*patterns.length)];
+ return {type:'pattern',name:'Pattern Pulse',...p,opts:shuffle([...p.opts])};
+}
+const wordBank=[['TCA','CAT'],['OGD','DOG'],['HSIF','FISH'],['KOOB','BOOK'],['ELPPA','APPLE'],['NIRTA','TRAIN'],['NEERG','GREEN'],['RAEHT','HEART'],['THGIL','LIGHT'],['REWOLF','FLOWER'],['RETUPMOC','COMPUTER']];
+function makeWord(){
+ let possible=wordBank.filter(w=>difficulty==='Easy'?w[1].length<=4:difficulty==='Medium'?w[1].length<=5:difficulty==='Hard'?w[1].length<=6:true);
+ let w=possible[Math.floor(Math.random()*possible.length)];
+ return {type:'word',name:'Word Scramble',scramble:w[0],answer:w[1]};
+}
+function makeReaction(){
+ return {type:'reaction',name:'Reaction Rush',target:['🔴','⭐','🟢','⚡','🔵'][Math.floor(Math.random()*5)]};
+}
+
+/* IMPORTANT: two distinct game TYPES are chosen here every round. */
+function startRound(){
+ clearInterval(clock);
+ $('p1score').textContent=names[0]+': '+scores[0];
+ $('p2score').textContent=names[1]+': '+scores[1];
+ $('roundLabel').textContent='ROUND '+round+' / 5';
+ times=[0,0];
+
+ const makers=[makeNumber,makeMemory,makePattern,makeWord,makeReaction];
+ const a=(round-1)%makers.length;
+ const b=(a+1)%makers.length;
+
+ const gameA=makers[a]();
+ const gameB=makers[b]();
+
+ challenges=round%2===1?[gameA,gameB]:[gameB,gameA];
+ roundGames=challenges.map(c=>c.name);
+
+ current=firstPlayer;
+ startTurn();
+}
+function startTurn(){
+ clearInterval(clock);
+ active=true;memoryPhase=false;memoryAnswers=[];
+ $('turnLabel').textContent=names[current]+"'s turn — "+challenges[current].name;
+ $('timer').textContent='0.00s';$('feedback').textContent='';
+ $('challenge').innerHTML='';
+ started=performance.now();
+ clock=setInterval(()=>{if(active)$('timer').textContent=((performance.now()-started)/1000).toFixed(2)+'s';},30);
+ let c=challenges[current];
+ if(c.type==='numbers')renderNumbers(c);
+ if(c.type==='memory')renderMemory(c);
+ if(c.type==='pattern')renderPattern(c);
+ if(c.type==='word')renderWord(c);
+ if(c.type==='reaction')renderReaction(c);
+}
+function renderNumbers(c){
+ $('challenge').innerHTML='<div class="center"><span class="pill">NUMBER HUNT</span><div class="mission">'+c.prompt+'</div><p>Tap the correct answer.</p></div><div id="numbers" class="numbers"></div>';
+ c.nums.forEach(n=>{
+  let b=document.createElement('button');b.className='num';b.textContent=n;
+  b.onclick=()=>{if(!active)return;if(n===c.answer){b.classList.add('correct');finishTurn();}else{b.classList.add('wrong');b.disabled=true;$('feedback').textContent='Try again!';}};
+  $('numbers').appendChild(b);
+ });
+}
+function renderMemory(c){
+ $('challenge').innerHTML='<div class="center"><span class="pill">MEMORY RUSH</span><div class="mission">Remember the sequence</div><p id="memoryHint">Memorize the numbered tiles.</p></div><div class="memory" id="tiles"></div>';
+ for(let i=0;i<9;i++){
+  let b=document.createElement('button');b.className='tile';b.disabled=true;b.onclick=()=>memoryTap(i,c);$('tiles').appendChild(b);
+ }
+ c.sequence.forEach((n,i)=>{let b=$('tiles').children[n];b.classList.add('lit');b.textContent=i+1;});
+ setTimeout(()=>{
+  if(!active)return;
+  memoryPhase=true;
+  document.querySelectorAll('#tiles .tile').forEach(b=>{b.classList.remove('lit');b.textContent='?';b.disabled=false;});
+  $('memoryHint').textContent='Tap the tiles in order.';
+  started=performance.now();$('timer').textContent='0.00s';
+ },4000);
+}
+function memoryTap(n,c){
+ if(!active||!memoryPhase)return;
+ if(n===c.sequence[memoryAnswers.length]){
+  memoryAnswers.push(n);let b=$('tiles').children[n];b.textContent='✓';b.disabled=true;b.classList.add('correct');
+  if(memoryAnswers.length===c.sequence.length)finishTurn();
+ }else{
+  $('feedback').textContent='Wrong tile — start the sequence again.';
+  memoryAnswers=[];
+  document.querySelectorAll('#tiles .tile').forEach(b=>{b.textContent='?';b.disabled=false;b.classList.remove('correct');});
+ }
+}
+function renderPattern(c){
+ $('challenge').innerHTML='<div class="center"><span class="pill">PATTERN PULSE</span><div class="mission">'+c.prompt+'</div><p>Choose the missing item.</p><div class="choices" id="opts"></div></div>';
+ c.opts.forEach(o=>{let b=document.createElement('button');b.textContent=o;b.onclick=()=>{if(!active)return;if(o===c.answer)finishTurn();else{b.classList.add('wrong');b.disabled=true;}};$('opts').appendChild(b);});
+}
+function renderWord(c){
+ $('challenge').innerHTML='<div class="center"><span class="pill">WORD SCRAMBLE</span><div class="mission">Unscramble the letters</div><div class="word">'+c.scramble.split('').join(' ')+'</div><input id="wordInput" placeholder="Type the word" autocomplete="off"><button class="primary" style="width:100%" onclick="checkWord()">SUBMIT WORD</button></div>';
+}
+function checkWord(){
+ if(!active)return;
+ if($('wordInput').value.trim().toUpperCase()===challenges[current].answer)finishTurn();
+ else $('feedback').textContent='Not quite — try again!';
+}
+function renderReaction(c){
+ $('challenge').innerHTML='<div class="center"><span class="pill">REACTION RUSH</span><div class="mission">Tap '+c.target+' when it appears!</div><p>Wait for the target.</p><div class="choices" id="reactionChoices"></div></div>';
+ let opts=shuffle([c.target,'❌','💎','🌙']);
+ opts.forEach(o=>{let b=document.createElement('button');b.style.fontSize='32px';b.textContent='…';b.disabled=true;b.onclick=()=>{if(!active)return;if(o===c.target)finishTurn();else{$('feedback').textContent='Wrong target! Try again.';}};$('reactionChoices').appendChild(b);});
+ setTimeout(()=>{
+  if(!active)return;
+  [...$('reactionChoices').children].forEach((b,i)=>{b.textContent=opts[i];b.disabled=false;});
+  $('feedback').textContent='GO!';
+  started=performance.now();$('timer').textContent='0.00s';
+ },1000+Math.random()*1800);
+}
+function finishTurn(){
+ if(!active)return;
+ active=false;clearInterval(clock);
+ times[current]=(performance.now()-started)/1000;
+ $('timer').textContent=times[current].toFixed(2)+'s';
+ $('feedback').textContent='Completed in '+times[current].toFixed(2)+' seconds.';
+ if(current===firstPlayer){current=1-firstPlayer;setTimeout(startTurn,1000);}
+ else setTimeout(showResults,700);
+}
+function showResults(){
+ hide('game');show('result');
+ let w=times[0]===times[1]?-1:(times[0]<times[1]?0:1);
+ if(w>=0)scores[w]++;
+ roundHistory.push({round,times:[...times],winner:w,games:[...roundGames]});
+ $('roundWinner').textContent=w<0?'🤝 Round tied!':'🏆 '+names[w]+' wins the round!';
+ $('timeName1').textContent=names[0];$('time1').textContent=times[0].toFixed(2)+'s';$('gameName1').textContent=roundGames[0];
+ $('timeName2').textContent=names[1];$('time2').textContent=times[1].toFixed(2)+'s';$('gameName2').textContent=roundGames[1];
+ $('scoreSummary').textContent='Score: '+names[0]+' '+scores[0]+' — '+scores[1]+' '+names[1];
+ $('nextP1').textContent=names[0]+' plays first';$('nextP2').textContent=names[1]+' plays first';
+ if(round===5){hide('nextChoice');show('finishButton');}
+ else{show('nextChoice');hide('finishButton');$('choiceHint').textContent=w>=0?names[w]+' won this round. Choose who plays first next.':'Choose who plays first next round.';}
+}
+function nextRound(p){
+ firstPlayer=p;current=p;round++;hide('result');show('game');startRound();
+}
+function showFinal(){
+ hide('result');show('finished');
+ let w=scores[0]===scores[1]?-1:(scores[0]>scores[1]?0:1);
+ $('champion').textContent=w<0?'🤝 Match tied!':'🏆 '+names[w]+' wins RaceRush!';
+ $('finalScore').textContent=names[0]+' '+scores[0]+' — '+scores[1]+' '+names[1];
+ $('history').innerHTML='<h3>Round history</h3>'+roundHistory.map(r=>'<p>Round '+r.round+': '+r.games[0]+' — '+names[0]+' '+r.times[0].toFixed(2)+'s; '+r.games[1]+' — '+names[1]+' '+r.times[1].toFixed(2)+'s. '+(r.winner<0?'Tie':names[r.winner]+' won')+'</p>').join('');
+}
+</script>
+</body>
+</html>
