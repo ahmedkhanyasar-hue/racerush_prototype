@@ -155,7 +155,7 @@ $('tossTitle').textContent=names[0]+', choose Heads or Tails';
 function pickSide(side){
 tossSide=side;
 $('tossTitle').textContent='Flipping the coin...';
-document.querySelectorAll('#toss .grid button').forEach(b=>b.disabled=true);
+document.querySelectorAll('#toss > .grid button').forEach(b=>b.disabled=true);
 show('coin');
 $('coin').textContent='🪙';
 $('tossResult').textContent='';
